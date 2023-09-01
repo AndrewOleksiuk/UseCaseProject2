@@ -1,33 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 
 namespace UseCaseProject2.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class WeatherForecastController : ControllerBase
+	public class BalanceController : ControllerBase
 	{
-		private static readonly string[] Summaries = new[]
-		{
-		"Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-	};
+		private readonly ILogger<BalanceController> _logger;
 
-		private readonly ILogger<WeatherForecastController> _logger;
-
-		public WeatherForecastController(ILogger<WeatherForecastController> logger)
+		public BalanceController(ILogger<BalanceController> logger)
 		{
 			_logger = logger;
 		}
 
-		[HttpGet(Name = "GetWeatherForecast")]
-		public IEnumerable<WeatherForecast> Get()
+		[HttpGet(Name = "GetBalance")]
+		public IActionResult Get()
 		{
-			return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+			StripeConfiguration.ApiKey = "sk_test_4eC39HqLyjWDarjtT1zdp7dc";
+			var balanceService = new BalanceService();
+
+			try
 			{
-				Date = DateTime.Now.AddDays(index),
-				TemperatureC = Random.Shared.Next(-20, 55),
-				Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-			})
-			.ToArray();
+				Balance balance = balanceService.Get();
+				return Ok(balance);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Error: {ex}");
+				return NoContent();
+			}
 		}
 	}
 }

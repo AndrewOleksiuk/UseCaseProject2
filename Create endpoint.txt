@@ -1,0 +1,47 @@
+how to call stripe API to get balance from this doc? https://stripe.com/docs/testing. I use c# language
+ChatGPT
+If you're using C# to interact with the Stripe API, you would typically use Stripe's .NET SDK. Here's how you can call the Stripe API to get the balance using C# and the Stripe.NET SDK:
+
+Setup:
+
+Install the Stripe.NET SDK: You can use NuGet to install the Stripe.NET package. In the NuGet Package Manager Console, type:
+mathematica
+Copy code
+Install-Package Stripe.net
+API Keys: You need to get your Stripe API test keys. From your Stripe dashboard, find your test secret key, which starts with sk_test_....
+Calling the API:
+
+Here's a simple example using C#:
+
+csharp
+Copy code
+using System;
+using Stripe;
+
+class Program
+{
+    static void Main()
+    {
+        StripeConfiguration.ApiKey = "sk_test_XXXXXXXXXXXXXXXXX"; // Replace with your test secret key
+
+        var balanceService = new BalanceService();
+        Balance balance = balanceService.Get();
+
+        foreach (var available in balance.Available)
+        {
+            Console.WriteLine($"Available funds in {available.Currency.ToUpper()}: {available.Amount / 100.0:C}");
+        }
+
+        foreach (var pending in balance.Pending)
+        {
+            Console.WriteLine($"Pending funds in {pending.Currency.ToUpper()}: {pending.Amount / 100.0:C}");
+        }
+    }
+}
+This code initializes the Stripe SDK with your test secret key, fetches the balance, and then prints available and pending funds by currency.
+
+Testing:
+
+Since you're in test mode, remember to use Stripe's testing cards and methods as described in the documentation. These will let you simulate various scenarios without real-world effects or charges.
+
+Remember, when switching to production, you must replace the test API key with your live secret key. Always protect and keep your live secret key secure, and never expose it in client-side code or public repositories.
