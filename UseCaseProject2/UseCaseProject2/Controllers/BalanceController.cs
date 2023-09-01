@@ -8,11 +8,15 @@ namespace UseCaseProject2.Controllers
 	public class BalanceController : ControllerBase
 	{
 		private readonly ILogger<BalanceController> _logger;
+		private readonly IBalanceServiceWrapper _balanceServiceWrapper;
+		private readonly IBalanceTransactionServiceWrapper _balanceTransactionServiceWrapper;
 		private const string API_KEY = "sk_test_4eC39HqLyjWDarjtT1zdp7dc";
 
-		public BalanceController(ILogger<BalanceController> logger)
+		public BalanceController(ILogger<BalanceController> logger, IBalanceServiceWrapper balanceServiceWrapper, IBalanceTransactionServiceWrapper balanceTransactionServiceWrapper)
 		{
 			_logger = logger;
+			_balanceServiceWrapper = balanceServiceWrapper;
+			_balanceTransactionServiceWrapper = balanceTransactionServiceWrapper;
 		}
 
 		[HttpGet]

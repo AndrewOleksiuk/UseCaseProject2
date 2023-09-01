@@ -1,0 +1,88 @@
+If the BalanceService and BalanceTransactionService from the Stripe SDK cannot be mocked directly due to limitations such as being sealed or lacking an interface, you can create a wrapper around these services. This approach involves creating your own interfaces and classes that wrap the Stripe SDK methods, and then mocking these interfaces in your tests.
+
+Creating Wrapper Classes and Interfaces:
+First, we'll create interfaces and classes to wrap around the Stripe SDK:
+
+csharp
+Copy code
+public interface IBalanceServiceWrapper
+{
+    Balance GetBalance();
+}
+
+public class BalanceServiceWrapper : IBalanceServiceWrapper
+{
+    public Balance GetBalance()
+    {
+        return new BalanceService().Get();
+    }
+}
+
+public interface IBalanceTransactionServiceWrapper
+{
+    StripeList<BalanceTransaction> ListTransactions(BalanceTransactionListOptions options);
+}
+
+public class BalanceTransactionServiceWrapper : IBalanceTransactionServiceWrapper
+{
+    public StripeList<BalanceTransaction> ListTransactions(BalanceTransactionListOptions options)
+    {
+        return new BalanceTransactionService().List(options);
+    }
+}
+Refactor the Controller:
+Modify your BalanceController to accept these interfaces in its constructor:
+
+csharp
+Copy code
+public class BalanceController : ControllerBase
+{
+    private readonly ILogger<BalanceController> _logger;
+    private readonly IBalanceServiceWrapper _balanceServiceWrapper;
+    private readonly IBalanceTransactionServiceWrapper _balanceTransactionServiceWrapper;
+
+    public BalanceController(ILogger<BalanceController> logger, IBalanceServiceWrapper balanceServiceWrapper, IBalanceTransactionServiceWrapper balanceTransactionServiceWrapper)
+    {
+        _logger = logger;
+        _balanceServiceWrapper = balanceServiceWrapper;
+        _balanceTransactionServiceWrapper = balanceTransactionServiceWrapper;
+    }
+
+    // ... rest of the controller
+}
+Writing Unit Tests:
+Now, let's use Moq to mock the wrapper interfaces and write unit tests:
+
+csharp
+Copy code
+using Moq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Xunit;
+
+public class BalanceControllerTests
+{
+    [Fact]
+    public void Get_ReturnsBalance()
+    {
+        // Arrange
+        var loggerMock = new Mock<ILogger<BalanceController>>();
+        var balanceServiceMock = new Mock<IBalanceServiceWrapper>();
+        var balanceTransactionServiceMock = new Mock<IBalanceTransactionServiceWrapper>();
+
+        var dummyBalance = new Balance();
+        balanceServiceMock.Setup(bs => bs.GetBalance()).Returns(dummyBalance);
+
+        var controller = new BalanceController(loggerMock.Object, balanceServiceMock.Object, balanceTransactionServiceMock.Object);
+
+        // Act
+        var result = controller.Get();
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(dummyBalance, okResult.Value);
+    }
+
+    // ... Similarly, write tests for GetPaginated() method, handling different cases including errors.
+}
+This approach allows you to mock and test the behavior of your controller without directly interacting with the Stripe SDK in your unit tests.
