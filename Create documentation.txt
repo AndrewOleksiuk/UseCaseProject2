@@ -1,0 +1,28 @@
+I need to write Application description: 2 paragraphs, 4-10 Sentences. 
+
+Information on how to run developed application locally. 
+
+At least 2 example URLs how to use developed endpoint
+ChatGPT
+Application Description
+The BalanceChecker application is a state-of-the-art financial tool designed to provide real-time balance and transaction data using the Stripe platform. Users can seamlessly retrieve their current balance and view paginated transaction lists, all through a user-friendly and secure API interface. Built on a robust backend framework, the application prioritizes both performance and security, ensuring timely data retrieval without compromising user data. Its modular design allows for easy future expansions, and the integration of the Stripe SDK ensures up-to-date compatibility with the latest Stripe features.
+
+Hosted on a robust ASP.NET Core platform, BalanceChecker offers reliable endpoints catered to developers and businesses that need a quick and efficient way to fetch balance-related data. With built-in error handling, the application gracefully manages any potential issues, always aiming to deliver a smooth user experience. The logging mechanism helps in monitoring and troubleshooting, making it an ideal choice for both developers and businesses looking for a dependable Stripe balance-checking tool.
+
+Running the Application Locally
+Clone the repository to your local machine using git clone [repository-url].
+Navigate to the root directory of the cloned project using cd BalanceChecker.
+Install the required packages and dependencies using dotnet restore.
+Set up the required environment variables, especially your Stripe API Key.
+Run the application using dotnet run. This will start the server, and the application will be accessible on https://localhost:5001 (or the port specified).
+Example URLs
+Retrieve Current Balance:
+Use a browser or an API tool like Postman to access:
+https://localhost:5001/balance
+
+Get Paginated Transaction Data:
+To fetch the first 10 transactions, use:
+https://localhost:5001/balance/paginated?number=10
+
+For subsequent transactions, use the ID of the last transaction you received to get the next set:
+https://localhost:5001/balance/paginated?number=10&startingAfter=lastTransactionId
