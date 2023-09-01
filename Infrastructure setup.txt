@@ -1,0 +1,42 @@
+- How to Bind SonarCloud.io to my repository - i use .net 6
+
+To bind your .NET 6 repository with SonarCloud.io, you'll need to go through several steps:
+
+Create a SonarCloud.io Account:
+
+If you haven’t already, sign up for an account at SonarCloud.io.
+Set Up Your Project:
+
+After logging in, click on the '+' icon on the top right and choose 'Analyze new project'.
+Follow the on-screen instructions to choose your repository provider and bind your desired repository. SonarCloud supports various platforms including GitHub, Bitbucket, and Azure DevOps.
+Get the SonarScanner for .NET:
+
+You can install it globally using the .NET Core CLI:
+csharp
+Copy code
+dotnet tool install --global dotnet-sonarscanner
+Alternatively, if you want it for just a specific project, omit the --global flag.
+Integrate with your CI/CD Pipeline:
+
+The general process involves:
+Begin the SonarScanner: dotnet sonarscanner begin /k:"ProjectKey" /o:"OrganizationKey" /d:sonar.login="YourSonarCloudToken"
+Build your solution: dotnet build
+End the SonarScanner: dotnet sonarscanner end /d:sonar.login="YourSonarCloudToken"
+Your CI/CD tool might vary (like Jenkins, Azure DevOps, GitHub Actions, etc.), but the core idea will be the same. Integrate the above commands into the appropriate places in your CI/CD pipeline.
+Additional Configuration (Optional):
+
+If you want to specify additional settings or parameters, you can provide them to the SonarScanner using the /d: switch, like /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" for OpenCover reports.
+If you're using unit tests, make sure to run your tests between the begin and end commands, and provide SonarScanner with the test results and coverage reports if necessary.
+Review Analysis Results:
+
+After your CI/CD pipeline runs, navigate to SonarCloud.io to see the analysis results for your repository.
+Integrate with Pull Requests (Optional):
+
+SonarCloud offers integration with pull requests for some providers (e.g., GitHub, Bitbucket). If set up, this will analyze pull requests and provide feedback directly in the PR interface. Follow the documentation on SonarCloud for your specific provider.
+Continuous Integration:
+
+Make sure to integrate SonarCloud scanning into your regular CI process so that you're continuously checking the quality of your codebase.
+Review & Setup Quality Gates (Optional):
+
+SonarCloud provides "Quality Gates" which are essentially criteria that your codebase should meet (like no critical bugs, code coverage > 80%, etc.). If the criteria aren't met, the Quality Gate fails, indicating you might not want to release or deploy that version of the software. You can configure and tailor these to your project's needs.
+By following these steps, you can effectively bind and use SonarCloud.io with your .NET 6 repository to maintain code quality and ensure best practices are followed.
