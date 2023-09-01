@@ -8,22 +8,47 @@ namespace UseCaseProject2.Controllers
 	public class BalanceController : ControllerBase
 	{
 		private readonly ILogger<BalanceController> _logger;
+		private const string API_KEY = "sk_test_4eC39HqLyjWDarjtT1zdp7dc";
 
 		public BalanceController(ILogger<BalanceController> logger)
 		{
 			_logger = logger;
 		}
 
-		[HttpGet(Name = "GetBalance")]
+		[HttpGet]
 		public IActionResult Get()
 		{
-			StripeConfiguration.ApiKey = "sk_test_4eC39HqLyjWDarjtT1zdp7dc";
+			StripeConfiguration.ApiKey = API_KEY;
 			var balanceService = new BalanceService();
 
 			try
 			{
 				Balance balance = balanceService.Get();
 				return Ok(balance);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Error: {ex}");
+				return NoContent();
+			}
+		}
+
+		[HttpGet("paginated")]
+		public IActionResult GetPaginated([FromQuery] int number, string? startingAfter)
+		{
+			StripeConfiguration.ApiKey = API_KEY;
+			var balanceTransactionService = new BalanceTransactionService();
+
+			try
+			{
+				var balanceTransactionOptions = new BalanceTransactionListOptions
+				{
+					Limit = number,
+					StartingAfter = startingAfter ?? null
+				};
+
+				var balanceTransactions = balanceTransactionService.List(balanceTransactionOptions);
+				return Ok(balanceTransactions);
 			}
 			catch (Exception ex)
 			{
